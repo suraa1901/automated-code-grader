@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Edit test cases - {{ assignment['name'] }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Edit test cases</h1>
+    <p class="lede">{{ assignment['name'] }} — fix a mistake, add more, or remove one.</p>
+  </div>
+  <a class="btn" href="{{ url_for('view_assignment', assignment_id=assignment['id']) }}">&larr; Back to assignment</a>
+</div>
+
+<form method="POST" class="card">
+  {% if test_cases %}
+  <h3>Existing test cases</h3>
+  {% for tc in test_cases %}
+  <div class="testcase-row testcase-existing">
+    <input type="hidden" name="existing_id" value="{{ tc['id'] }}">
+    <div>
+      <label>Input (stdin)</label>
+      <textarea name="input_{{ tc['id'] }}" class="code" rows="3">{{ tc['input_data'] }}</textarea>
+    </div>
+    <div>
+      <label>Expected output</label>
+      <textarea name="output_{{ tc['id'] }}" class="code" rows="3">{{ tc['expected_output'] }}</textarea>
+    </div>
+    <div>
+      <label>Weight</label>
+      <input type="number" name="weight_{{ tc['id'] }}" value="{{ tc['weight'] }}" min="0" step="0.5">
+      <label class="hidden-checkbox-label">
+        <input type="checkbox" name="hidden_{{ tc['id'] }}" class="hidden-checkbox" {% if tc['is_hidden'] %}checked{% endif %}>
+        Hidden from students
+      </label>
+      <label class="hidden-checkbox-label" style="color:var(--accent-flag);">
+        <input type="checkbox" name="existing_delete" value="{{ tc['id'] }}" class="hidden-checkbox">
+        Delete this test case
+      </label>
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <p class="lede">No test cases yet — add one below.</p>
+  {% endif %}
+
+  <h3 class="section-gap">Add a new test case</h3>
+  <div id="testcase-list"></div>
+  <button type="button" class="btn btn-sm" id="add-testcase">+ Add test case</button>
+
+  <div class="section-gap">
+    <button type="submit" class="btn btn-primary">Save changes</button>
+  </div>
+  <p class="lede" style="margin-top:10px;">
+    Saving does not re-grade existing submissions automatically — go back and click
+    "Grade all submissions" afterward so scores reflect the update.
+  </p>
+</form>
+
+<template id="testcase-template">
+  <div class="testcase-row">
+    <div>
+      <label>Input (stdin)</label>
+      <textarea name="test_input" class="code" rows="3" placeholder="e.g. 5 3"></textarea>
+    </div>
+    <div>
+      <label>Expected output</label>
+      <textarea name="test_output" class="code" rows="3" placeholder="e.g. 8"></textarea>
+    </div>
+    <div>
+      <label>Weight</label>
+      <input type="number" name="test_weight" value="1" min="0" step="0.5">
+      <label class="hidden-checkbox-label">
+        <input type="checkbox" name="test_hidden" class="hidden-checkbox">
+        Hidden from students
+      </label>
+    </div>
+  </div>
+</template>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

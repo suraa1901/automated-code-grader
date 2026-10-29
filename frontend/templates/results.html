@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Results - {{ assignment['name'] }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Grading results</h1>
+    <p class="lede">{{ assignment['name'] }}</p>
+  </div>
+  <a class="btn" href="{{ url_for('view_assignment', assignment_id=assignment['id']) }}">&larr; Back to assignment</a>
+</div>
+
+{% if submissions %}
+  {% for s in submissions %}
+  <div class="card">
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div class="stamp {{ 'pass' if s['score'] == 100 else ('fail' if s['score'] == 0 else '') }}">
+        {% if s['score'] is not none %}{{ s['score']|round|int }}%{% else %}--{% endif %}
+      </div>
+      <div>
+        <h2 style="margin-bottom:2px;">{{ s['student_name'] }} <span class="lede" style="font-size:14px;">— attempt #{{ s['attempt_number'] }}{% if s['id'] in latest_ids %} <span class="pill pass">LATEST — COUNTS</span>{% endif %}{% if s['is_late'] %} <span class="pill flag">LATE</span>{% endif %}</span></h2>
+        <span class="tag">{{ s['language'] }}</span>
+        <span class="lede">{{ s['filename'] }}</span>
+      </div>
+    </div>
+
+    {% set rows = details.get(s['id'], []) %}
+    {% if rows %}
+    <table class="section-gap">
+      <thead><tr><th>Input</th><th>Expected</th><th>Actual</th><th>Result</th><th>Time</th></tr></thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td><code>{{ r['input_data'] or '(none)' }}</code></td>
+          <td><code>{{ r['expected_output'] }}</code></td>
+          <td><code>{{ r['actual_output'] or r['error_message'] }}</code></td>
+          <td>
+            {% if r['passed'] %}<span class="pill pass">PASS</span>
+            {% else %}<span class="pill fail">FAIL</span>{% endif %}
+          </td>
+          <td class="lede">{{ r['execution_time_ms'] }} ms</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="lede section-gap">Not graded yet.</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+{% else %}
+<div class="card empty-state">No submissions to show.</div>
+{% endif %}
+{% endblock %}

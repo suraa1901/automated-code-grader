@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}{{ assignment['name'] }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ assignment['name'] }}</h1>
+    <p class="lede">{{ assignment['description'] or 'No description.' }}</p>
+    <div class="assignment-meta" style="margin-top:8px;">
+      <span class="tag">{{ assignment['allowed_language'] }}</span>
+      {% if assignment['due_date'] %}<span>Due: {{ assignment['due_date'] }}</span>{% endif %}
+      {% if assignment['max_attempts'] %}<span>Max attempts: {{ assignment['max_attempts'] }}</span>{% endif %}
+    </div>
+  </div>
+  {% if current_user['role'] == 'teacher' %}
+  <div style="display:flex; gap:10px;">
+    <a class="btn" href="{{ url_for('manage_test_cases', assignment_id=assignment['id']) }}">Edit test cases</a>
+    <form method="POST" action="{{ url_for('grade_assignment', assignment_id=assignment['id']) }}">
+      <button class="btn btn-primary" type="submit">Grade all submissions</button>
+    </form>
+    <form method="POST" action="{{ url_for('check_plagiarism', assignment_id=assignment['id']) }}">
+      <button class="btn" type="submit">Check plagiarism</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+{% if current_user['role'] == 'teacher' and analytics %}
+<div class="card">
+  <h2>Analytics</h2>
+  <div class="assignment-meta" style="margin-top:12px; gap:28px;">
+    <span>Average score: <strong>{{ analytics['avg_score'] if analytics['avg_score'] is not none else '—' }}{% if analytics['avg_score'] is not none %}%{% endif %}</strong></span>
+    <span>Graded: <strong>{{ analytics['graded_count'] }}</strong></span>
+    <span>Perfect scores: <strong>{{ analytics['pass_count'] }}</strong></span>
+    <span>Flagged plagiarism pairs: <strong>{{ analytics['flagged_count'] }}</strong></span>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <h2>Test cases ({{ test_cases|length }})</h2>
+  {% if test_cases %}
+  <table>
+    <thead><tr><th>Input</th><th>Expected output</th><th>Weight</th></tr></thead>
+    <tbody>
+      {% for tc in test_cases %}
+      <tr>
+        {% if tc['is_hidden'] and current_user['role'] != 'teacher' %}
+        <td><span class="lede">Hidden</span></td>
+        <td><span class="lede">Hidden — used for grading only</span></td>
+        <td>{{ tc['weight'] }}</td>
+        {% else %}
+        <td><code>{{ tc['input_data'] or '(none)' }}</code></td>
+        <td><code>{{ tc['expected_output'] }}</code>{% if tc['is_hidden'] %} <span class="tag">hidden</span>{% endif %}</td>
+        <td>{{ tc['weight'] }}</td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="lede">No test cases defined.</p>
+  {% endif %}
+</div>
+
+{% if current_user['role'] == 'student' %}
+<div class="card">
+  <h2>Submit code</h2>
+  <p class="lede">
+    Submitting as <strong>{{ current_user['name'] }}</strong>.
+    {% if assignment['max_attempts'] %}
+      Attempts used: {{ attempts_used }} / {{ assignment['max_attempts'] }}.
+      {% if attempts_remaining == 0 %}<span style="color:var(--accent-flag);">No attempts remaining.</span>{% endif %}
+    {% else %}
+      Attempts used: {{ attempts_used }} (unlimited).
+    {% endif %}
+  </p>
+  {% if not assignment['max_attempts'] or attempts_remaining > 0 %}
+  <form method="POST" action="{{ url_for('submit_code', assignment_id=assignment['id']) }}">
+    <label for="language">Language</label>
+    <select id="language" name="language">
+      {% if assignment['allowed_language'] in ('python', 'both') %}<option value="python">Python</option>{% endif %}
+      {% if assignment['allowed_language'] in ('java', 'both') %}<option value="java">Java</option>{% endif %}
+    </select>
+    <label for="code_text">Paste code</label>
+    <textarea id="code_text" name="code_text" class="code" rows="10" placeholder="Paste source here, or upload a file below"></textarea>
+    <label for="code_file">...or upload a .py / .java file</label>
+    <input type="file" id="code_file" name="code_file" accept=".py,.java">
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  {% endif %}
+</div>
+{% endif %}
+
+<div class="card">
+  <h2>{% if current_user['role'] == 'teacher' %}Submissions ({{ submissions|length }}){% else %}Your submissions ({{ submissions|length }}){% endif %}</h2>
+  {% if submissions %}
+  <table>
+    <thead><tr>{% if current_user['role'] == 'teacher' %}<th>Student</th>{% endif %}<th>Attempt</th><th>Language</th><th>Filename</th><th>Score</th><th>Submitted</th></tr></thead>
+    <tbody>
+      {% for s in submissions %}
+      <tr>
+        {% if current_user['role'] == 'teacher' %}<td>{{ s['student_name'] }}</td>{% endif %}
+        <td>#{{ s['attempt_number'] }}{% if s['is_late'] %} <span class="pill flag">LATE</span>{% endif %}</td>
+        <td><span class="tag">{{ s['language'] }}</span></td>
+        <td>{{ s['filename'] }}</td>
+        <td>{% if s['score'] is not none %}{{ s['score'] }}%{% else %}<span class="lede">not graded</span>{% endif %}</td>
+        <td>{{ s['submitted_at'] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="lede">{% if current_user['role'] == 'teacher' %}No submissions yet.{% else %}You haven't submitted anything for this assignment yet.{% endif %}</p>
+  {% endif %}
+</div>
+
+<div style="display:flex; gap:10px;">
+  <a class="btn" href="{{ url_for('results', assignment_id=assignment['id']) }}">View grading results &rarr;</a>
+  {% if current_user['role'] == 'teacher' %}
+  <a class="btn" href="{{ url_for('plagiarism_view', assignment_id=assignment['id']) }}">View plagiarism report &rarr;</a>
+  {% endif %}
+</div>
+{% endblock %}

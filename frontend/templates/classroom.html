@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{{ classroom['name'] }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ classroom['name'] }}</h1>
+    {% if current_user['role'] == 'teacher' %}
+    <p class="lede">Join code: <strong>{{ classroom['join_code'] }}</strong> — share this with your students.</p>
+    {% endif %}
+  </div>
+  {% if current_user['role'] == 'teacher' %}
+  <a class="btn btn-primary" href="{{ url_for('new_assignment', classroom_id=classroom['id']) }}">+ New assignment</a>
+  {% endif %}
+</div>
+
+{% if current_user['role'] == 'teacher' and analytics %}
+<div class="card">
+  <h2>Classroom analytics</h2>
+  <div class="assignment-meta" style="margin-top:12px; gap:28px;">
+    <span>Class average: <strong>{{ analytics['avg_score'] if analytics['avg_score'] is not none else '—' }}{% if analytics['avg_score'] is not none %}%{% endif %}</strong></span>
+    <span>Graded submissions: <strong>{{ analytics['graded_count'] }}</strong></span>
+    <span>Flagged plagiarism pairs: <strong>{{ analytics['flagged_count'] }}</strong></span>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <h2>Assignments ({{ assignments|length }})</h2>
+  {% if assignments %}
+  <table>
+    <thead><tr><th>Name</th><th>Due</th><th>Test cases</th><th>Submissions</th></tr></thead>
+    <tbody>
+      {% for a in assignments %}
+      <tr onclick="window.location='{{ url_for('view_assignment', assignment_id=a['id']) }}'" style="cursor:pointer;">
+        <td>{{ a['name'] }}</td>
+        <td>{{ a['due_date'] or '—' }}</td>
+        <td>{{ a['test_case_count'] }}</td>
+        <td>{{ a['submission_count'] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="lede">No assignments yet.</p>
+  {% endif %}
+</div>
+
+{% if current_user['role'] == 'teacher' and roster is not none %}
+<div class="card">
+  <h2>Students ({{ roster|length }})</h2>
+  {% if roster %}
+  <table>
+    <thead><tr><th>Name</th><th>Username</th><th>Joined</th></tr></thead>
+    <tbody>
+      {% for s in roster %}
+      <tr>
+        <td>{{ s['name'] }}</td>
+        <td>{{ s['username'] }}</td>
+        <td>{{ s['joined_at'] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="lede">No students have joined yet. Share the join code above.</p>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

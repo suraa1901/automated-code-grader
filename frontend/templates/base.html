@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Ledger{% endblock %} · Code Grader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="shell">
+    {% if current_user %}
+    <aside class="rail">
+      <a href="{{ url_for('dashboard') }}" class="brand">
+        <span class="brand-mark">&lt;/&gt;</span>
+        <span class="brand-text">Ledger<span class="brand-sub">grading &amp; integrity</span></span>
+      </a>
+      <nav class="rail-nav">
+        <a href="{{ url_for('dashboard') }}">Classrooms</a>
+        {% if current_user['role'] == 'teacher' %}
+        <a href="{{ url_for('new_classroom') }}">+ New classroom</a>
+        {% else %}
+        <a href="{{ url_for('my_results') }}">My results</a>
+        {% endif %}
+      </nav>
+      <div class="rail-footnote">
+        Java + Python submissions<br>Structural &amp; textual similarity
+      </div>
+      <div class="rail-user">
+        <div class="rail-user-name">{{ current_user['name'] }}</div>
+        <span class="tag">{{ current_user['role'] }}</span>
+        <a href="{{ url_for('logout') }}" class="rail-logout">Log out</a>
+      </div>
+    </aside>
+    {% endif %}
+
+    <main class="content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-stack">
+            {% for category, message in messages %}
+              <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

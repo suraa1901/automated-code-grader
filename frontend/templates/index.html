@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Classrooms{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Classrooms</h1>
+    <p class="lede">
+      {% if current_user['role'] == 'teacher' %}Each classroom has its own roster and assignments.
+      {% else %}Join a classroom with the code your teacher gives you.{% endif %}
+    </p>
+  </div>
+  {% if current_user['role'] == 'teacher' %}
+  <a class="btn btn-primary" href="{{ url_for('new_classroom') }}">+ New classroom</a>
+  {% endif %}
+</div>
+
+{% if current_user['role'] == 'student' %}
+<form method="POST" action="{{ url_for('join_classroom') }}" class="card" style="max-width:420px; display:flex; gap:10px; align-items:flex-end;">
+  <div style="flex:1;">
+    <label for="join_code">Join code</label>
+    <input type="text" id="join_code" name="join_code" required placeholder="e.g. 7QX2AB" style="margin-bottom:0; text-transform:uppercase;">
+  </div>
+  <button type="submit" class="btn btn-primary">Join</button>
+</form>
+{% endif %}
+
+{% if classrooms %}
+<div class="card-grid">
+  {% for c in classrooms %}
+  <a class="card assignment-card" href="{{ url_for('classroom_view', classroom_id=c['id']) }}">
+    <h2>{{ c['name'] }}</h2>
+    <div class="assignment-meta">
+      {% if current_user['role'] == 'teacher' %}<span class="tag">code: {{ c['join_code'] }}</span>{% endif %}
+      <span>{{ c['assignment_count'] }} assignment{{ 's' if c['assignment_count'] != 1 else '' }}</span>
+      <span>{{ c['student_count'] }} student{{ 's' if c['student_count'] != 1 else '' }}</span>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card empty-state">
+  {% if current_user['role'] == 'teacher' %}No classrooms yet. Create one to get started.
+  {% else %}You haven't joined a classroom yet. Ask your teacher for a join code.{% endif %}
+</div>
+{% endif %}
+
+{% if legacy_assignments %}
+<div class="section-gap">
+  <h2>Uncategorized assignments</h2>
+  <p class="lede">Created before classrooms existed — still visible to everyone signed in.</p>
+  <div class="card-grid">
+    {% for a in legacy_assignments %}
+    <a class="card assignment-card" href="{{ url_for('view_assignment', assignment_id=a['id']) }}">
+      <h2>{{ a['name'] }}</h2>
+      <p class="lede" style="margin-bottom:0;">{{ a['description'] or 'No description.' }}</p>
+      <div class="assignment-meta">
+        <span class="tag">{{ a['allowed_language'] }}</span>
+        <span>{{ a['test_case_count'] }} test case{{ 's' if a['test_case_count'] != 1 else '' }}</span>
+        <span>{{ a['submission_count'] }} submission{{ 's' if a['submission_count'] != 1 else '' }}</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

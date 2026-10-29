@@ -1,0 +1,430 @@
+/* ---------------------------------------------------------------------
+   Design tokens
+   Subject: a grading ledger crossed with a code editor. Deep ink-blue
+   surfaces (not pure black), chalk text, three semantic accents:
+   teal = pass, amber = score, coral = plagiarism flag.
+--------------------------------------------------------------------- */
+:root {
+  --bg: #161c29;
+  --surface: #1e2636;
+  --surface-raised: #262f43;
+  --border: #333e56;
+  --text: #e8e6df;
+  --muted: #8b93a7;
+  --accent-pass: #4fb286;
+  --accent-score: #e0a458;
+  --accent-flag: #d9584f;
+  --font-display: 'IBM Plex Mono', monospace;
+  --font-body: 'Inter', sans-serif;
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+a { color: inherit; text-decoration: none; }
+
+.shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------------------------------------------------- sidebar rail --- */
+.rail {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-mark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--accent-score);
+  font-size: 18px;
+}
+
+.brand-text {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.brand-sub {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+}
+
+.rail-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rail-nav a {
+  padding: 9px 12px;
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: 14px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.rail-nav a:hover {
+  background: var(--surface-raised);
+  color: var(--text);
+}
+
+.rail-footnote {
+  margin-top: auto;
+  font-size: 12px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  line-height: 1.6;
+}
+
+/* ------------------------------------------------------------ main --- */
+.content {
+  flex: 1;
+  padding: 40px 48px;
+  max-width: 1100px;
+  margin: 0 auto; /* centers the content column in any leftover space -
+                     without this it hugs the left edge past ~1200px wide,
+                     which is the "not centered" bug on the login page */
+  width: 100%;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+h1 { font-size: 26px; }
+h2 { font-size: 19px; }
+h3 { font-size: 15px; }
+
+p.lede { color: var(--muted); margin-top: 0; }
+
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 28px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ------------------------------------------------------------- flash - */
+.flash-stack { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
+.flash { padding: 10px 14px; border-radius: var(--radius); font-size: 14px; }
+.flash-success { background: rgba(79,178,134,0.15); border: 1px solid var(--accent-pass); color: var(--accent-pass); }
+.flash-error { background: rgba(217,88,79,0.15); border: 1px solid var(--accent-flag); color: var(--accent-flag); }
+
+/* -------------------------------------------------------------- btn - */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.15s;
+}
+
+.btn:hover { border-color: var(--accent-score); }
+.btn:active { transform: translateY(1px); }
+
+.btn-primary {
+  background: var(--accent-score);
+  color: #1c1408;
+  border-color: var(--accent-score);
+}
+
+.btn-flag { background: var(--accent-flag); border-color: var(--accent-flag); color: #2a0d0a; }
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+
+/* ------------------------------------------------------------- card - */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-bottom: 18px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.assignment-card { display: block; }
+.assignment-card:hover { border-color: var(--accent-score); }
+
+.assignment-meta {
+  display: flex;
+  gap: 14px;
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-family: var(--font-display);
+}
+.assignment-meta span { margin-right: 14px; }
+.assignment-meta span:last-child { margin-right: 0; }
+
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--surface-raised);
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ------------------------------------------------------------ forms - */
+label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+input[type=text], input[type=number], textarea, select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 10px 12px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+textarea.code { font-family: var(--font-display); font-size: 13px; min-height: 140px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.testcase-row { display: grid; grid-template-columns: 1fr 1fr 90px; gap: 12px; align-items: start; }
+.testcase-row:has(.hidden-checkbox) { grid-template-columns: 1fr 1fr 190px; }
+.hidden-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-top: 10px;
+  cursor: pointer;
+}
+.hidden-checkbox-label input.hidden-checkbox {
+  width: auto;
+  margin: 0;
+}
+
+/* ------------------------------------------------------------ table - */
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-family: var(--font-display); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+tr:last-child td { border-bottom: none; }
+
+/* --------------------------------------------------- score stamp ---- */
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-score);
+  color: var(--accent-score);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  transform: rotate(-4deg);
+}
+.stamp.pass { border-color: var(--accent-pass); color: var(--accent-pass); }
+.stamp.fail { border-color: var(--accent-flag); color: var(--accent-flag); }
+
+.pill { padding: 3px 9px; border-radius: 20px; font-size: 12px; font-family: var(--font-display); font-weight: 600; }
+.pill.pass { background: rgba(79,178,134,0.15); color: var(--accent-pass); }
+.pill.fail { background: rgba(217,88,79,0.15); color: var(--accent-flag); }
+.pill.flag { background: rgba(217,88,79,0.18); color: var(--accent-flag); border: 1px solid var(--accent-flag); }
+
+/* --------------------------------------------------- similarity bar - */
+.sim-bar-track { background: var(--bg); border-radius: 20px; height: 8px; overflow: hidden; width: 120px; }
+.sim-bar-fill { height: 100%; border-radius: 20px; }
+
+/* ---------------------------------------------------------- diff ---- */
+.diff-wrap table.diff { width: 100%; font-family: var(--font-display); font-size: 12.5px; background: var(--surface); border-radius: var(--radius); overflow: hidden; }
+.diff-wrap td { padding: 2px 8px; border-bottom: none; }
+.diff_add { background: rgba(79,178,134,0.2); }
+.diff_sub { background: rgba(217,88,79,0.2); }
+.diff_chg { background: rgba(224,164,88,0.2); }
+
+.empty-state { color: var(--muted); text-align: center; padding: 40px 0; }
+
+.section-gap { margin-top: 36px; }
+
+/* ------------------------------------------------------ auth pages --- */
+.auth-wrap {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: 0;
+}
+.auth-switch { margin-top: 16px; margin-bottom: 0; text-align: center; }
+.auth-switch a { color: var(--accent-score); font-weight: 600; }
+
+.role-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.role-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 400;
+  margin-bottom: 0;
+  transition: border-color 0.15s;
+}
+.role-option:has(input:checked) { border-color: var(--accent-score); }
+.role-option input { width: auto; margin: 3px 0 0; }
+.role-option strong { display: block; font-size: 13px; color: var(--text); font-weight: 600; }
+.role-option small { display: block; font-size: 11.5px; color: var(--muted); margin-top: 2px; line-height: 1.35; }
+
+/* --------------------------------------------- sidebar user footer --- */
+.rail-user {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  margin-top: -4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rail-user-name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+}
+.rail-logout {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.rail-logout:hover { color: var(--accent-flag); }
+
+/* ------------------------------------------------- hidden test case - */
+.hidden-note { color: var(--muted); font-style: italic; }
+
+/* ---------------------------------------------------- responsive --- */
+/* The layout above assumes a wide desktop screen. Below ~720px the fixed
+   240px sidebar and generous padding stop fitting - this collapses the
+   sidebar into a top bar and tightens spacing/grids so pages (including
+   login/register, which have no sidebar at all) stay centered and usable
+   on a phone or a narrow classroom laptop window. */
+@media (max-width: 720px) {
+  .shell {
+    flex-direction: column;
+  }
+  .rail {
+    width: 100%;
+    height: auto;
+    position: relative;
+    top: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+    padding: 16px 20px;
+  }
+  .rail-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .rail-nav a { padding: 6px 10px; }
+  .rail-footnote {
+    display: none; /* decorative on a phone-width nav bar, just adds height */
+  }
+  .rail-user {
+    border-top: none;
+    margin-top: 0;
+    padding-top: 0;
+    margin-left: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+  .content {
+    padding: 24px 20px;
+    max-width: 100%;
+  }
+  .auth-wrap {
+    min-height: 60vh;
+  }
+  .page-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .field-row,
+  .testcase-row,
+  .role-toggle,
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    max-width: 100%;
+  }
+  .stamp {
+    width: 40px;
+    height: 40px;
+    font-size: 12px;
+  }
+}

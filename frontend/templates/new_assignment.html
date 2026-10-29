@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}New assignment{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>New assignment</h1>
+    <p class="lede">In <strong>{{ classroom['name'] }}</strong> — define the problem, then add test cases.</p>
+  </div>
+</div>
+
+<form method="POST" class="card">
+  <label for="name">Assignment name</label>
+  <input type="text" id="name" name="name" required placeholder="e.g. Assignment 3 - Sorting Algorithms">
+
+  <label for="description">Description</label>
+  <textarea id="description" name="description" rows="3" placeholder="Optional problem statement or notes"></textarea>
+
+  <div class="field-row">
+    <div>
+      <label for="allowed_language">Accepted language</label>
+      <select id="allowed_language" name="allowed_language">
+        <option value="both">Java or Python</option>
+        <option value="python">Python only</option>
+        <option value="java">Java only</option>
+      </select>
+    </div>
+    <div>
+      <label for="plagiarism_threshold">Plagiarism flag threshold (%)</label>
+      <input type="number" id="plagiarism_threshold" name="plagiarism_threshold" value="70" min="0" max="100">
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div>
+      <label for="due_date">Due date (optional)</label>
+      <input type="datetime-local" id="due_date" name="due_date">
+    </div>
+    <div>
+      <label for="max_attempts">Max attempts per student (optional)</label>
+      <input type="number" id="max_attempts" name="max_attempts" min="1" placeholder="Leave blank for unlimited">
+    </div>
+  </div>
+
+  <h3 class="section-gap">Test cases</h3>
+  <p class="lede" style="margin-top:0;">stdin input on the left, exact expected stdout on the right.</p>
+
+  <div id="testcase-list"></div>
+  <button type="button" class="btn btn-sm" id="add-testcase">+ Add test case</button>
+
+  <div class="section-gap">
+    <button type="submit" class="btn btn-primary">Create assignment</button>
+  </div>
+</form>
+
+<template id="testcase-template">
+  <div class="testcase-row">
+    <div>
+      <label>Input (stdin)</label>
+      <textarea name="test_input" class="code" rows="3" placeholder="e.g. 5 3"></textarea>
+    </div>
+    <div>
+      <label>Expected output</label>
+      <textarea name="test_output" class="code" rows="3" placeholder="e.g. 8"></textarea>
+    </div>
+    <div>
+      <label>Weight</label>
+      <input type="number" name="test_weight" value="1" min="0" step="0.5">
+      <label class="hidden-checkbox-label">
+        <input type="checkbox" name="test_hidden" class="hidden-checkbox">
+        Hidden from students
+      </label>
+    </div>
+  </div>
+</template>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

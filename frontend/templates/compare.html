@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Compare {{ sub1['student_name'] }} vs {{ sub2['student_name'] }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ sub1['student_name'] }} &harr; {{ sub2['student_name'] }}</h1>
+    <p class="lede">Line-by-line diff. Green = added, red = removed, amber = changed.</p>
+  </div>
+</div>
+
+<div class="card diff-wrap">
+  {{ diff_html | safe }}
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Plagiarism report - {{ assignment['name'] }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Plagiarism report</h1>
+    <p class="lede">{{ assignment['name'] }} &middot; flag threshold {{ assignment['plagiarism_threshold'] }}%</p>
+  </div>
+  <a class="btn" href="{{ url_for('view_assignment', assignment_id=assignment['id']) }}">&larr; Back to assignment</a>
+</div>
+
+<div class="card">
+  <h2>Pairwise similarity</h2>
+  <p class="lede">Combined score = 60% structural (k-gram winnowing) + 40% textual (TF-IDF cosine). Only submissions in the same language are compared.</p>
+
+  {% if pairs %}
+  <table class="section-gap">
+    <thead>
+      <tr>
+        <th>Pair</th>
+        <th>Structural</th>
+        <th>Textual</th>
+        <th>Combined</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in pairs %}
+      <tr>
+        <td>{{ p['student_1'] }} &harr; {{ p['student_2'] }}</td>
+        <td>{{ p['token_similarity'] }}%</td>
+        <td>{{ p['text_similarity'] }}%</td>
+        <td>
+          <div class="sim-bar-track">
+            <div class="sim-bar-fill" data-sim="{{ p['combined_score'] }}"></div>
+          </div>
+          <span class="lede">{{ p['combined_score'] }}%</span>
+        </td>
+        <td>
+          {% if p['flagged'] %}<span class="pill flag">FLAGGED</span>
+          {% else %}<span class="lede">clear</span>{% endif %}
+        </td>
+        <td><a class="btn btn-sm" href="{{ url_for('compare', sub_id_1=p['submission_id_1'], sub_id_2=p['submission_id_2']) }}">Compare</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="lede">No comparisons yet - click "Check plagiarism" from the assignment page.</p>
+  {% endif %}
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}My results{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>My results</h1>
+    <p class="lede">Your latest attempt on every assignment you've submitted to.</p>
+  </div>
+</div>
+
+<div class="card">
+  {% if rows %}
+  <table>
+    <thead><tr><th>Classroom</th><th>Assignment</th><th>Score</th><th>Attempts used</th><th>Due</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for r in rows %}
+      <tr onclick="window.location='{{ url_for('view_assignment', assignment_id=r['assignment_id']) }}'" style="cursor:pointer;">
+        <td>{{ r['classroom_name'] or '—' }}</td>
+        <td>{{ r['assignment_name'] }}</td>
+        <td>{% if r['score'] is not none %}{{ r['score'] }}%{% else %}<span class="lede">not graded</span>{% endif %}</td>
+        <td>{{ r['attempt_number'] }}</td>
+        <td>{{ r['due_date'] or '—' }}</td>
+        <td>{% if r['is_late'] %}<span class="pill flag">LATE</span>{% else %}<span class="pill pass">ON TIME</span>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="lede">You haven't submitted anything yet.</p>
+  {% endif %}
+</div>
+{% endblock %}
